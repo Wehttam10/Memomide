@@ -10,6 +10,8 @@ import RevisionQueue from './pages/RevisionQueue';
 import SubjectDetail from './pages/SubjectDetail';
 import Subjects from './pages/Subjects';
 import TopicDetail from './pages/TopicDetail';
+import Awards from './pages/Awards';
+import Search from './pages/Search';
 
 export default function App() {
   return (
@@ -24,8 +26,11 @@ export default function App() {
         <Route path="/topics/:topicId/notes" element={<Notes />} />
         <Route path="/topics/:topicId/practice" element={<Practice />} />
         <Route path="/revision" element={<RevisionQueue />} />
+        <Route path="/awards" element={<Awards />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
+
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

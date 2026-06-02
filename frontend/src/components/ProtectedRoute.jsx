@@ -13,7 +13,8 @@ export default function ProtectedRoute() {
       <Sidebar />
       <div className="relative z-10 min-w-0 flex-1">
         <Navbar />
-        <main className="mx-auto w-full max-w-7xl px-4 py-5 pb-24 sm:px-6 lg:px-8 lg:pb-8">
+        <main className="mt-6 mx-auto w-full max-w-7xl px-4 py-5 pb-24 sm:px-6 lg:px-8 lg:pb-8">
+
           <Outlet />
         </main>
         <div className="fixed inset-x-0 bottom-0 z-20 lg:hidden">
