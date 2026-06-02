@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: memomind-backend
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+        placeholder: "postgresql://postgres:password@db.xxxx.supabase.co:5432/postgres"
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+        placeholder: "AIzaSy..."
+      - key: ALLOWED_ORIGINS
+        sync: false
+        placeholder: "https://your-frontend.vercel.app"

@@ -1,0 +1,11 @@
+backend/.env
+frontend/.env
+backend/study_memory_coach.db
+backend/__pycache__/
+backend/app/**/__pycache__/
+frontend/node_modules/
+frontend/dist/
+.venv/
+backend/.venv/
+.DS_Store
+.agents/
