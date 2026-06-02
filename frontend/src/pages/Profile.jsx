@@ -94,9 +94,9 @@ export default function Profile() {
         <p className="text-slate-500 text-sm mt-1">Manage your account information and view your all-time learning stats.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
         {/* Left Column: Account Details Card */}
-        <div className="lg:col-span-1 rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-6 shadow-md flex flex-col items-center text-center space-y-6">
+        <div className="lg:col-span-1 w-full max-w-md mx-auto lg:max-w-none rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-6 shadow-md flex flex-col items-center text-center space-y-6">
           {/* Avatar with smooth gradient */}
           <div className="relative">
             <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-teal flex items-center justify-center text-white font-black text-3xl shadow-lg shadow-violet-200">
@@ -156,7 +156,7 @@ export default function Profile() {
             <span className="text-[10px] font-bold uppercase tracking-wider text-violet-600 bg-violet-50 px-2.5 py-1 rounded-full border border-violet-100">Cumulative</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {statItems.map((item, idx) => {
               const Icon = item.icon;
               return (
@@ -183,4 +183,7 @@ export default function Profile() {
     </div>
   );
 }
+
+
+
 
