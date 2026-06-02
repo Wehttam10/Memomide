@@ -273,3 +273,23 @@ def get_awards(db: Session = Depends(get_db), current_user: User = Depends(get_c
         },
         "badges": badges
     }
+
+
+@router.get("/profile-stats")
+def get_profile_stats(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    total_subjects = db.query(Subject).filter(Subject.user_id == current_user.id).count()
+    total_topics = db.query(Topic).join(Subject).filter(Subject.user_id == current_user.id).count()
+    total_notes = db.query(Note).join(Topic).join(Subject).filter(Subject.user_id == current_user.id).count()
+    total_attempts = db.query(Attempt).filter(Attempt.user_id == current_user.id).count()
+    total_questions = db.query(Question).join(Topic).join(Subject).filter(Subject.user_id == current_user.id).count()
+    average_score = db.query(func.avg(Attempt.score)).filter(Attempt.user_id == current_user.id).scalar() or 0
+
+    return {
+        "total_subjects": total_subjects,
+        "total_topics": total_topics,
+        "total_notes": total_notes,
+        "total_attempts": total_attempts,
+        "total_questions": total_questions,
+        "average_score": round(float(average_score), 1)
+    }
+

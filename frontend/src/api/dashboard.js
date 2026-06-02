@@ -5,4 +5,6 @@ export const getAIStatus = () => apiRequest('/dashboard/ai-status');
 export const getRevisionDue = () => apiRequest('/revision/due');
 export const searchWorkspace = (query) => apiRequest(`/dashboard/search?q=${encodeURIComponent(query)}`);
 export const getAwards = () => apiRequest('/dashboard/awards');
+export const getProfileStats = () => apiRequest('/dashboard/profile-stats');
+
 
