@@ -11,7 +11,7 @@ services:
         value: 3.11.9
       - key: DATABASE_URL
         sync: false
-        placeholder: "postgresql://postgres:password@db.xxxx.supabase.co:5432/postgres"
+        placeholder: "postgresql://postgres.juedapbufkksrjbajpsl:password@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres"
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: AI_PROVIDER
