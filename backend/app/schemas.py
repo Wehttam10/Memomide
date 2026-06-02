@@ -22,12 +22,17 @@ class UserOut(BaseModel):
     name: str
     email: EmailStr
     created_at: datetime
+    avatar: Optional[str] = None
 
 
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserOut
+
+
+class AvatarUpdate(BaseModel):
+    avatar: str
 
 
 class SubjectBase(BaseModel):

@@ -5,7 +5,7 @@ from ..auth import create_access_token, hash_password, verify_password
 from ..database import get_db
 from ..dependencies import get_current_user
 from ..models import User
-from ..schemas import Token, UserCreate, UserLogin, UserOut
+from ..schemas import Token, UserCreate, UserLogin, UserOut, AvatarUpdate
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -34,3 +34,12 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.put("/avatar", response_model=UserOut)
+def update_avatar(payload: AvatarUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    current_user.avatar = payload.avatar
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+

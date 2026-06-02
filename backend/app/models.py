@@ -14,6 +14,7 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    avatar = Column(Text, nullable=True)
 
     subjects = relationship("Subject", back_populates="user", cascade="all, delete-orphan")
     attempts = relationship("Attempt", back_populates="user", cascade="all, delete-orphan")

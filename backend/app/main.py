@@ -7,6 +7,14 @@ from .routers import attempts, auth, dashboard, notes, questions, revision, subj
 
 Base.metadata.create_all(bind=engine)
 
+from sqlalchemy import text
+try:
+    with engine.connect() as conn:
+        conn.execute(text("ALTER TABLE users ADD COLUMN avatar TEXT;"))
+        conn.commit()
+except Exception:
+    pass
+
 app = FastAPI(title="MemoMind API")
 
 origins_env = os.getenv("ALLOWED_ORIGINS")

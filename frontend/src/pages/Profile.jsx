@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { me, logout } from '../api/auth';
+import { me, logout, updateAvatar } from '../api/auth';
 import { getProfileStats } from '../api/dashboard';
 import Loading from '../components/Loading';
 import { 
@@ -14,8 +14,46 @@ import {
   Sparkles, 
   TrendingUp, 
   ShieldCheck,
-  LogOut
+  LogOut,
+  Camera
 } from 'lucide-react';
+
+function resizeAndCompressImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const max_size = 128;
+      let width = img.width;
+      let height = img.height;
+
+      // Crop/Scale to a square of max_size x max_size
+      if (width > height) {
+        if (width > max_size) {
+          height *= max_size / width;
+          width = max_size;
+        }
+      } else {
+        if (height > max_size) {
+          width *= max_size / height;
+          height = max_size;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Compress to JPEG at 0.75 quality
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      callback(dataUrl);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -28,6 +66,31 @@ export default function Profile() {
     logout();
     navigate('/login');
   };
+
+  const handleAvatarClick = () => {
+    document.getElementById('avatar-input').click();
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image is too large. Please select an image under 5MB.");
+      return;
+    }
+
+    resizeAndCompressImage(file, (base64Data) => {
+      updateAvatar(base64Data)
+        .then((updatedUser) => {
+          setUser(updatedUser);
+        })
+        .catch((err) => {
+          alert(err.message || "Failed to update profile picture");
+        });
+    });
+  };
+
 
 
   useEffect(() => {
@@ -106,15 +169,38 @@ export default function Profile() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
         {/* Left Column: Account Details Card */}
         <div className="lg:col-span-1 w-full max-w-md mx-auto lg:max-w-none rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-6 shadow-md flex flex-col items-center text-center space-y-6">
-          {/* Avatar with smooth gradient */}
-          <div className="relative">
-            <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-teal flex items-center justify-center text-white font-black text-3xl shadow-lg shadow-violet-200">
-              {initials}
+          {/* Avatar with smooth gradient / upload overlay */}
+          <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
+            {user.avatar ? (
+              <img 
+                src={user.avatar} 
+                alt="Profile avatar" 
+                className="h-24 w-24 rounded-2xl object-cover shadow-lg shadow-violet-200 ring-2 ring-violet-200/50 group-hover:ring-violet-400 transition duration-300"
+              />
+            ) : (
+              <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-teal flex items-center justify-center text-white font-black text-3xl shadow-lg shadow-violet-200 group-hover:from-violet-600 group-hover:to-teal/90 transition duration-300">
+                {initials}
+              </div>
+            )}
+            
+            {/* Hover Camera Overlay */}
+            <div className="absolute inset-0 bg-black/45 rounded-2xl flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Camera className="h-5 w-5" />
             </div>
-            <span className="absolute -bottom-2 -right-2 h-7 w-7 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white shadow-sm" title="Verified Account">
+
+            <span className="absolute -bottom-2 -right-2 h-7 w-7 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white shadow-sm z-10" title="Verified Account">
               <ShieldCheck className="h-4 w-4" />
             </span>
           </div>
+          
+          {/* Hidden File Input */}
+          <input 
+            type="file" 
+            id="avatar-input" 
+            accept="image/*" 
+            className="hidden" 
+            onChange={handleAvatarChange}
+          />
 
           {/* User Basic Info */}
           <div className="space-y-1">

@@ -19,3 +19,8 @@ export function logout() {
 export function me() {
   return apiRequest('/auth/me');
 }
+
+export function updateAvatar(avatar) {
+  return apiRequest('/auth/avatar', jsonOptions('PUT', { avatar }));
+}
+
