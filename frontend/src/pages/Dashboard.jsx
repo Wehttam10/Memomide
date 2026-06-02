@@ -19,7 +19,9 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { getAIStatus, getDashboardSummary } from '../api/dashboard';
+import { me } from '../api/auth';
 import EmptyState from '../components/EmptyState';
+
 import Loading from '../components/Loading';
 import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
@@ -86,6 +88,7 @@ const TOPIC_ROW_TONES = ['topic-row-violet', 'topic-row-coral', 'topic-row-amber
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [user, setUser] = useState(null);
   const [aiStatus, setAiStatus] = useState(null);
   const [error, setError] = useState('');
 
@@ -97,6 +100,10 @@ export default function Dashboard() {
     getAIStatus()
       .then(setAiStatus)
       .catch(() => setAiStatus({ provider: 'mock', has_api_key: false, mode: 'mock' }));
+
+    me()
+      .then(setUser)
+      .catch(() => {});
   }, []);
 
   if (error) return <div className="panel text-rose-700">{error}</div>;
@@ -133,9 +140,9 @@ export default function Dashboard() {
               {greeting}, ready to study?
             </div>
             <h2 className="mt-4 text-3xl font-black leading-tight text-ink sm:text-4xl">
-              Your memory dashboard,{' '}
+              Welcome,{' '}
               <span className="bg-gradient-to-r from-violet-600 via-teal to-amber bg-clip-text text-transparent">
-                in living colour.
+                {user ? user.name : 'Student'}
               </span>
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
