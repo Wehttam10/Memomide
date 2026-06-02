@@ -58,7 +58,7 @@ export default function Sidebar({ mobile = false }) {
 
   return (
     <aside
-      className={`sticky top-0 h-screen border-r border-white/60 bg-white/55 px-4 py-5 backdrop-blur-xl hidden lg:flex flex-col justify-between transition-all duration-300 ${
+      className={`sticky top-0 h-[100dvh] border-r border-white/60 bg-white/55 px-4 py-5 backdrop-blur-xl hidden lg:flex flex-col justify-between transition-all duration-300 ${
         isMinimized ? 'w-20' : 'w-64'
       }`}
     >

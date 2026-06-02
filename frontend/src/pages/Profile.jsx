@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { me } from '../api/auth';
+import { useNavigate } from 'react-router-dom';
+import { me, logout } from '../api/auth';
 import { getProfileStats } from '../api/dashboard';
 import Loading from '../components/Loading';
 import { 
@@ -12,14 +13,22 @@ import {
   ClipboardList, 
   Sparkles, 
   TrendingUp, 
-  ShieldCheck
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
 
 export default function Profile() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
 
   useEffect(() => {
     Promise.all([me(), getProfileStats()])
@@ -147,6 +156,16 @@ export default function Profile() {
               </div>
             </div>
           </div>
+
+          
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-rose-600 bg-rose-50/50 hover:bg-rose-50 hover:text-rose-700 border border-rose-100/50 shadow-sm transition-all"
+            type="button"
+          >
+            <LogOut className="h-4 w-4 pointer-events-none" />
+            Logout
+          </button>
         </div>
 
         {/* Right Column: Statistics Grid Card */}
