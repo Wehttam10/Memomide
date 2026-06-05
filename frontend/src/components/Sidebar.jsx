@@ -35,20 +35,20 @@ export default function Sidebar({ mobile = false }) {
 
   if (mobile) {
     return (
-      <aside className="block border-t border-white/60 bg-white/70 px-3 py-2 backdrop-blur-xl lg:hidden">
+      <aside className="block border-t border-neutral-200 bg-white px-3 py-2 lg:hidden">
         <nav className="grid grid-cols-5 gap-1">
           {links.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center gap-1 px-2 py-2 text-[10px] font-semibold transition ${
-                  isActive ? 'nav-active' : 'text-slate-600 hover:bg-white/80 hover:text-ink'
+                `flex flex-col items-center justify-center gap-1 px-2 py-2 text-[10px] font-semibold transition-all duration-200 ${
+                  isActive ? 'nav-active rounded-md' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
                 }`
               }
             >
               <Icon className="h-4 w-4 pointer-events-none" />
-              <span className="truncate max-w-full text-center">{label}</span>
+              <span className="truncate max-w-full text-center font-display">{label}</span>
             </NavLink>
           ))}
         </nav>
@@ -58,7 +58,7 @@ export default function Sidebar({ mobile = false }) {
 
   return (
     <aside
-      className={`sticky top-0 h-[100dvh] border-r border-white/60 bg-white/55 px-4 py-5 backdrop-blur-xl hidden lg:flex flex-col justify-between transition-all duration-300 ${
+      className={`sticky top-0 h-[100dvh] border-r border-neutral-200 bg-white px-4 py-5 hidden lg:flex flex-col justify-between transition-all duration-300 ${
         isMinimized ? 'w-20' : 'w-64'
       }`}
     >
@@ -68,25 +68,25 @@ export default function Sidebar({ mobile = false }) {
           {!isMinimized ? (
             <div className="flex items-center gap-3 overflow-hidden transition-all">
               <img
-                className="h-12 w-12 rounded-xl bg-white object-contain p-1 shadow-sm ring-2 ring-violet-200"
+                className="h-10 w-10 rounded-lg bg-white object-contain p-1 border border-neutral-200"
                 src="/memomind-logo.jpeg"
                 alt="MemoMind logo"
               />
-              <div>
-                <p className="brand-gradient text-lg font-black leading-tight">MemoMind</p>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Study coach</p>
+              <div className="transition-all duration-300 hover:tracking-wide">
+                <p className="brand-gradient text-lg font-black leading-tight font-display text-neutral-900">MemoMind</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 font-mono">Study coach</p>
               </div>
             </div>
           ) : (
             <img
-              className="h-10 w-10 mx-auto rounded-xl bg-white object-contain p-1 shadow-sm ring-2 ring-violet-200"
+              className="h-10 w-10 mx-auto rounded-lg bg-white object-contain p-1 border border-neutral-200"
               src="/memomind-logo.jpeg"
               alt="MemoMind logo"
             />
           )}
           <button
             onClick={toggleMinimize}
-            className={`flex h-8 w-8 items-center justify-center rounded-xl bg-white/60 hover:bg-white border border-violet-100/50 shadow-sm text-violet-600 transition ${
+            className={`flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 transition-all duration-200 ${
               isMinimized ? 'mt-2' : ''
             }`}
             type="button"
@@ -107,31 +107,31 @@ export default function Sidebar({ mobile = false }) {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center rounded-xl font-semibold transition ${
-                  isMinimized ? 'justify-center p-3' : 'gap-3 px-3 py-2.5 text-sm'
-                } ${isActive ? 'nav-active' : 'text-slate-600 hover:bg-white/80 hover:text-ink'}`
+                `flex items-center rounded-lg font-medium transition-all duration-200 ${
+                  isMinimized ? 'justify-center p-3' : 'gap-3 px-3 py-2.5 text-sm hover:translate-x-1'
+                } ${isActive ? 'nav-active' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 font-display'}`
               }
               title={isMinimized ? label : undefined}
             >
               <Icon className="h-4 w-4 pointer-events-none" />
-              {!isMinimized && <span>{label}</span>}
+              {!isMinimized && <span className="font-display tracking-tight">{label}</span>}
             </NavLink>
           ))}
         </nav>
       </div>
 
       {/* Logout Action */}
-      <div className="pt-4 border-t border-violet-100/30">
+      <div className="pt-4 border-t border-neutral-100">
         <button
           onClick={handleLogout}
-          className={`flex w-full items-center rounded-xl font-semibold text-rose-600 hover:bg-rose-50/50 hover:text-rose-700 transition ${
-            isMinimized ? 'justify-center p-3' : 'gap-3 px-3 py-2.5 text-sm'
+          className={`flex w-full items-center rounded-lg font-medium text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 transition-all duration-200 ${
+            isMinimized ? 'justify-center p-3' : 'gap-3 px-3 py-2.5 text-sm hover:translate-x-1'
           }`}
           title={isMinimized ? "Logout" : undefined}
           type="button"
         >
           <LogOut className="h-4 w-4 pointer-events-none" />
-          {!isMinimized && <span>Logout</span>}
+          {!isMinimized && <span className="font-display tracking-tight">Logout</span>}
         </button>
       </div>
     </aside>
