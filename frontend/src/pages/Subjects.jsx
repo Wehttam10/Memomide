@@ -6,10 +6,10 @@ import EmptyState from '../components/EmptyState';
 import Loading from '../components/Loading';
 
 const SUBJECT_TONES = [
-  { stripe: 'stat-stripe-violet', icon: 'bg-violet-100 text-violet-600', hover: 'hover:text-violet-600' },
-  { stripe: 'stat-stripe-teal', icon: 'bg-teal/15 text-teal', hover: 'hover:text-teal' },
-  { stripe: 'stat-stripe-coral', icon: 'bg-coral/15 text-coral', hover: 'hover:text-coral' },
-  { stripe: 'stat-stripe-amber', icon: 'bg-amber/15 text-amber', hover: 'hover:text-amber' },
+  { stripe: 'stat-stripe-violet', icon: 'bg-neutral-100 text-neutral-850 border border-neutral-200', hover: 'hover:text-black' },
+  { stripe: 'stat-stripe-teal', icon: 'bg-neutral-100 text-neutral-850 border border-neutral-200', hover: 'hover:text-black' },
+  { stripe: 'stat-stripe-coral', icon: 'bg-neutral-100 text-neutral-850 border border-neutral-200', hover: 'hover:text-black' },
+  { stripe: 'stat-stripe-amber', icon: 'bg-neutral-100 text-neutral-850 border border-neutral-200', hover: 'hover:text-black' },
 ];
 
 export default function Subjects() {
@@ -42,28 +42,23 @@ export default function Subjects() {
 
   return (
     <div className="space-y-6">
-      <section className="celebration-card relative overflow-hidden rounded-2xl p-6 shadow-sm sm:p-7">
-        <div aria-hidden className="pointer-events-none absolute -left-12 -top-12 h-48 w-48 rounded-full bg-violet-300/45 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute -bottom-16 -right-10 h-56 w-56 rounded-full bg-amber/40 blur-3xl" />
+      <section className="panel relative overflow-hidden p-6 sm:p-7">
         <div className="relative flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/60 bg-white/55 px-3 py-1 text-xs font-bold uppercase tracking-wider text-violet-700 backdrop-blur">
-              <Library className="h-3.5 w-3.5" />
+            <div className="feature-pill">
+              <Library className="h-3.5 w-3.5 text-neutral-600" />
               Study library
             </div>
-            <h2 className="mt-3 text-3xl font-black leading-tight text-ink sm:text-4xl">
-              Your{' '}
-              <span className="bg-gradient-to-r from-violet-600 via-teal to-amber bg-clip-text text-transparent">
-                subjects
-              </span>
+            <h2 className="mt-3 text-3xl font-bold font-display tracking-tight text-neutral-900 sm:text-4xl">
+              Your <span className="underline decoration-neutral-300 decoration-wavy">subjects</span>
             </h2>
             <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
               Organize topics by course, module, or exam paper. Each subject powers AI questions and spaced repetition.
             </p>
           </div>
-          <div className="rounded-2xl bg-white/70 px-4 py-3 text-center shadow-sm ring-1 ring-violet-100 backdrop-blur">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-violet-600">In library</p>
-            <p className="mt-1 text-3xl font-black text-ink">{subjects.length}</p>
+          <div className="rounded-lg bg-neutral-50 border border-neutral-250 px-4 py-3 text-center">
+            <p className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-500">In library</p>
+            <p className="mt-1 text-3xl font-bold font-display text-neutral-900 leading-none">{subjects.length}</p>
           </div>
         </div>
       </section>
@@ -77,17 +72,17 @@ export default function Subjects() {
                 return (
                   <div
                     key={subject.id}
-                    className="panel relative overflow-hidden rounded-2xl transition hover:-translate-y-0.5 hover:bg-white hover:shadow-lg"
+                    className="panel relative overflow-hidden transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md hover:border-neutral-350"
                   >
                     <div className={`stat-stripe ${tone.stripe}`} />
                     <div className="flex items-start gap-3">
-                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone.icon}`}>
-                        <BookOpen className="h-5 w-5" />
+                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${tone.icon}`}>
+                        <BookOpen className="h-5 w-5 pointer-events-none" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <Link
                           to={`/subjects/${subject.id}`}
-                          className={`text-lg font-black text-ink ${tone.hover}`}
+                          className={`text-lg font-bold font-display tracking-tight text-neutral-900 transition-colors ${tone.hover}`}
                         >
                           {subject.name}
                         </Link>
@@ -98,7 +93,7 @@ export default function Subjects() {
                     </div>
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
                       <Link
-                        className="inline-flex items-center gap-1.5 text-sm font-bold text-violet-600 hover:text-violet-700"
+                        className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-800 hover:text-black font-display tracking-tight transition-transform hover:translate-x-0.5"
                         to={`/subjects/${subject.id}`}
                       >
                         Open subject
@@ -118,7 +113,7 @@ export default function Subjects() {
               })}
             </div>
           ) : (
-            <div className="panel rounded-2xl">
+            <div className="panel rounded-lg">
               <EmptyState
                 icon={BookOpen}
                 title="No subjects yet"
@@ -130,13 +125,13 @@ export default function Subjects() {
 
         <form
           onSubmit={handleCreate}
-          className="panel space-y-3 rounded-2xl lg:sticky lg:top-24 lg:self-start"
+          className="panel space-y-3 lg:sticky lg:top-24 lg:self-start"
         >
           <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-md shadow-violet-500/30" style={{ background: 'linear-gradient(135deg, #8b5cf6, #0f9f9a)' }}>
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg text-white bg-neutral-900">
               <Sparkles className="h-4 w-4" />
             </span>
-            <h3 className="text-lg font-black text-ink">Create subject</h3>
+            <h3 className="text-lg font-bold font-display text-neutral-900 tracking-tight">Create subject</h3>
           </div>
           <p className="text-sm text-slate-500">
             Give it a clear name &mdash; it&rsquo;s the anchor for every topic underneath.

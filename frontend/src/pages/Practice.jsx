@@ -63,15 +63,15 @@ export default function Practice() {
 
   return (
     <div className="space-y-6">
-      <section className="celebration-card rounded-lg border border-teal/15 p-5 shadow-sm">
+      <section className="panel space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-teal/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-teal">
-              <Brain className="h-3.5 w-3.5" />
+            <div className="feature-pill">
+              <Brain className="h-3.5 w-3.5 text-neutral-600 pointer-events-none" />
               Focus session
             </div>
-            <h2 className="mt-3 text-2xl font-bold">{topic.title} practice</h2>
-            <p className="text-sm text-slate-500">Memory health: {Math.round(topic.memory_health_score)}%. Next review: {topic.next_review_date ? new Date(topic.next_review_date).toLocaleDateString() : 'Not scheduled'}</p>
+            <h2 className="mt-3 text-2xl font-bold font-display text-neutral-900 tracking-tight">{topic.title} practice</h2>
+            <p className="text-xs text-slate-550 mt-1 font-light">Memory health: <span className="font-mono font-bold text-neutral-900">{Math.round(topic.memory_health_score)}%</span> &bull; Next review: <span className="font-mono">{topic.next_review_date ? new Date(topic.next_review_date).toLocaleDateString() : 'Not scheduled'}</span></p>
           </div>
           <div className="flex items-center gap-2">
             <StatusBadge status={topic.status} />
@@ -82,26 +82,26 @@ export default function Practice() {
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
-          <div className="rounded-lg border border-teal/15 bg-white/90 p-4">
+          <div className="rounded-lg border border-neutral-200 bg-white p-4">
             <div className="flex items-center justify-between gap-3 text-sm">
               <span className="font-semibold text-slate-700">Session progress</span>
-              <span className="font-bold text-ink">{answeredCount}/{questions.length || 5} answered</span>
+              <span className="font-bold text-neutral-900 font-mono text-xs">{answeredCount}/{questions.length || 5} answered</span>
             </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-teal transition-all" style={{ width: `${completionPercent}%` }} />
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-neutral-100">
+              <div className="h-full rounded-full bg-neutral-900 transition-all" style={{ width: `${completionPercent}%` }} />
             </div>
           </div>
-          <div className="rounded-lg border border-teal/15 bg-white/90 p-4 text-sm">
-            <div className="flex items-center gap-2 font-bold text-ink">
-              <Sparkles className="h-4 w-4 text-coral" />
+          <div className="rounded-lg border border-neutral-200 bg-white p-4 text-sm">
+            <div className="flex items-center gap-2 font-bold text-neutral-900 font-display tracking-tight">
+              <Sparkles className="h-4 w-4 text-neutral-950 pointer-events-none" />
               Goal
             </div>
-            <p className="mt-1 text-slate-500">Give complete answers, then compare with AI feedback.</p>
+            <p className="mt-1 text-slate-555">Give complete answers, then compare with AI feedback.</p>
           </div>
         </div>
-          <div className="mt-4 rounded-lg border border-teal/15 bg-[#edf8f5] p-4">
+        <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-            <span className="font-semibold text-slate-700">
+            <span className="font-semibold text-neutral-700">
               Question source: {aiStatus?.mode === 'real_ai' ? 'Gemini AI' : 'Mock AI'}
             </span>
             <span className="text-slate-500">
@@ -114,7 +114,7 @@ export default function Practice() {
           </div>
           {generating ? (
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
-              <div className="ai-progress-bar h-full w-1/2 rounded-full bg-teal" />
+              <div className="ai-progress-bar h-full w-1/2 rounded-full" />
             </div>
           ) : null}
         </div>
@@ -133,23 +133,23 @@ export default function Practice() {
           return (
             <section key={question.id} className="panel space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  <span className="rounded-full bg-teal/10 px-2.5 py-1 text-teal">{question.question_type.replace('_', ' ')}</span>
-                  <span className="rounded-full bg-amber/10 px-2.5 py-1 text-amber">{question.difficulty}</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded bg-neutral-100 border border-neutral-200 px-2 py-0.5 text-neutral-800 font-mono text-[10px] uppercase">{question.question_type.replace('_', ' ')}</span>
+                  <span className="rounded bg-neutral-100 border border-neutral-200 px-2 py-0.5 text-neutral-800 font-mono text-[10px] uppercase">{question.difficulty}</span>
                 </div>
-                {result ? <span className="rounded-full bg-coral/10 px-2.5 py-1 text-xs font-bold text-coral">Answered</span> : null}
+                {result ? <span className="rounded bg-neutral-900 border border-neutral-900 px-2 py-0.5 text-[10px] font-bold text-white font-mono uppercase">Answered</span> : null}
               </div>
-              <h3 className="text-lg font-bold">{question.question_text}</h3>
+              <h3 className="text-lg font-bold font-display text-neutral-900 tracking-tight">{question.question_text}</h3>
               <textarea className="field min-h-28" placeholder="Type your answer..." value={answers[question.id] || ''} onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })} />
-              <button className="btn-primary" onClick={() => handleSubmit(question.id)} type="button"><Send className="h-4 w-4" />Submit answer</button>
+              <button className="btn-primary" onClick={() => handleSubmit(question.id)} type="button"><Send className="h-4 w-4 pointer-events-none" />Submit answer</button>
               {result ? (
-                <div className="rounded-lg border border-teal/20 bg-teal/5 p-4">
-                  <p className="font-bold">Score: {result.attempt.score}/10</p>
+                <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 space-y-2">
+                  <p className="font-bold font-display text-neutral-900">Score: <span className="font-mono">{result.attempt.score}/10</span></p>
                   <p className="mt-2 text-sm">{result.attempt.feedback}</p>
-                  <p className="mt-3 text-sm font-semibold">Missing points</p>
-                  <p className="whitespace-pre-wrap text-sm text-slate-600">{result.attempt.missing_points}</p>
-                  <p className="mt-3 text-sm font-semibold">Corrected answer</p>
-                  <p className="text-sm text-slate-600">{result.attempt.corrected_answer}</p>
+                  <p className="mt-3 text-xs font-bold font-mono uppercase tracking-wider text-neutral-500">Missing points</p>
+                  <p className="whitespace-pre-wrap text-sm text-slate-650">{result.attempt.missing_points}</p>
+                  <p className="mt-3 text-xs font-bold font-mono uppercase tracking-wider text-neutral-500">Corrected answer</p>
+                  <p className="text-sm text-slate-650">{result.attempt.corrected_answer}</p>
                 </div>
               ) : null}
             </section>
@@ -157,12 +157,12 @@ export default function Practice() {
         })}
       </div>
       <section className="panel">
-        <h3 className="font-bold">Attempt history</h3>
+        <h3 className="font-bold font-display text-neutral-900 tracking-tight">Attempt history</h3>
         {attempts.length > 0 ? (
           <div className="mt-3 grid gap-2 md:grid-cols-2">
             {attempts.map((attempt) => (
-                <div key={attempt.id} className="rounded-md border border-teal/15 bg-white/80 p-3 text-sm">
-                <span className="font-semibold">{attempt.score}/10</span> - {attempt.feedback}
+              <div key={attempt.id} className="rounded-lg border border-neutral-200 bg-white p-3 text-sm">
+                <span className="font-bold font-mono text-neutral-900">{attempt.score}/10</span> &mdash; <span className="text-slate-600 font-light">{attempt.feedback}</span>
               </div>
             ))}
           </div>
