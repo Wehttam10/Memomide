@@ -250,15 +250,15 @@ export default function Dashboard() {
                 <AreaChart data={data.topic_memory_health} margin={{ left: 0, right: 12, top: 12, bottom: 0 }}>
                   <defs>
                     <linearGradient id="memoryFill" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#09090b" stopOpacity={0.12} />
-                      <stop offset="100%" stopColor="#a3a3a3" stopOpacity={0.01} />
+                      <stop offset="0%" stopColor="var(--chart-fill)" stopOpacity={0.12} />
+                      <stop offset="100%" stopColor="var(--chart-stroke-end)" stopOpacity={0.01} />
                     </linearGradient>
                     <linearGradient id="memoryStroke" x1="0" x2="1" y1="0" y2="0">
-                      <stop offset="0%" stopColor="#09090b" />
-                      <stop offset="100%" stopColor="#737373" />
+                      <stop offset="0%" stopColor="var(--chart-stroke-start)" />
+                      <stop offset="100%" stopColor="var(--chart-stroke-end)" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid stroke="#f1f1f1" strokeDasharray="3 3" vertical={false} />
+                  <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: 'Plus Jakarta Sans', fill: '#888' }} tickLine={false} axisLine={false} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 11, fontFamily: 'Plus Jakarta Sans', fill: '#888' }} tickLine={false} axisLine={false} />
                   <Tooltip contentStyle={{ borderRadius: 6, borderColor: '#e5e5e5', fontFamily: 'Plus Jakarta Sans', fontSize: 12 }} />

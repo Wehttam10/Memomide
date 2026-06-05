@@ -35,7 +35,7 @@ export default function Sidebar({ mobile = false }) {
 
   if (mobile) {
     return (
-      <aside className="block border-t border-neutral-200 bg-white px-3 py-2 lg:hidden">
+      <aside className="block border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black px-3 py-2 lg:hidden">
         <nav className="grid grid-cols-5 gap-1">
           {links.map(({ to, label, icon: Icon }) => (
             <NavLink
@@ -43,7 +43,7 @@ export default function Sidebar({ mobile = false }) {
               to={to}
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center gap-1 px-2 py-2 text-[10px] font-semibold transition-all duration-200 ${
-                  isActive ? 'nav-active rounded-md' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
+                  isActive ? 'nav-active rounded-md' : 'text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white'
                 }`
               }
             >
@@ -58,7 +58,7 @@ export default function Sidebar({ mobile = false }) {
 
   return (
     <aside
-      className={`sticky top-0 h-[100dvh] border-r border-neutral-200 bg-white px-4 py-5 hidden lg:flex flex-col justify-between transition-all duration-300 ${
+      className={`sticky top-0 h-[100dvh] border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black px-4 py-5 hidden lg:flex flex-col justify-between transition-all duration-300 ${
         isMinimized ? 'w-20' : 'w-64'
       }`}
     >
@@ -68,25 +68,25 @@ export default function Sidebar({ mobile = false }) {
           {!isMinimized ? (
             <div className="flex items-center gap-3 overflow-hidden transition-all">
               <img
-                className="h-10 w-10 rounded-lg bg-white object-contain p-1 border border-neutral-200"
+                className="h-10 w-10 rounded-lg bg-white dark:bg-neutral-900 object-contain p-1 border border-neutral-200 dark:border-neutral-800"
                 src="/memomind-logo.jpeg"
                 alt="MemoMind logo"
               />
               <div className="transition-all duration-300 hover:tracking-wide">
-                <p className="brand-gradient text-lg font-black leading-tight font-display text-neutral-900">MemoMind</p>
+                <p className="brand-gradient text-lg font-black leading-tight font-display text-neutral-900 dark:text-white">MemoMind</p>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 font-mono">Study coach</p>
               </div>
             </div>
           ) : (
             <img
-              className="h-10 w-10 mx-auto rounded-lg bg-white object-contain p-1 border border-neutral-200"
+              className="h-10 w-10 mx-auto rounded-lg bg-white dark:bg-neutral-900 object-contain p-1 border border-neutral-200 dark:border-neutral-800"
               src="/memomind-logo.jpeg"
               alt="MemoMind logo"
             />
           )}
           <button
             onClick={toggleMinimize}
-            className={`flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 transition-all duration-200 ${
+            className={`flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-50 dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 transition-all duration-200 ${
               isMinimized ? 'mt-2' : ''
             }`}
             type="button"
@@ -109,7 +109,7 @@ export default function Sidebar({ mobile = false }) {
               className={({ isActive }) =>
                 `flex items-center rounded-lg font-medium transition-all duration-200 ${
                   isMinimized ? 'justify-center p-3' : 'gap-3 px-3 py-2.5 text-sm hover:translate-x-1'
-                } ${isActive ? 'nav-active' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 font-display'}`
+                } ${isActive ? 'nav-active' : 'text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white font-display'}`
               }
               title={isMinimized ? label : undefined}
             >
@@ -121,10 +121,10 @@ export default function Sidebar({ mobile = false }) {
       </div>
 
       {/* Logout Action */}
-      <div className="pt-4 border-t border-neutral-100">
+      <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800">
         <button
           onClick={handleLogout}
-          className={`flex w-full items-center rounded-lg font-medium text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 transition-all duration-200 ${
+          className={`flex w-full items-center rounded-lg font-medium text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-all duration-200 ${
             isMinimized ? 'justify-center p-3' : 'gap-3 px-3 py-2.5 text-sm hover:translate-x-1'
           }`}
           title={isMinimized ? "Logout" : undefined}
