@@ -57,6 +57,14 @@ class SubjectOut(SubjectBase):
     created_at: datetime
 
 
+class SubjectChatRequest(BaseModel):
+    message: str
+
+
+class SubjectChatResponse(BaseModel):
+    response: str
+
+
 class TopicBase(BaseModel):
     title: str = Field(min_length=1, max_length=180)
     description: str = ""

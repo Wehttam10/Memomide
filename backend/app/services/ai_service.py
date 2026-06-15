@@ -268,15 +268,18 @@ Return JSON in this exact format:
 """.strip()
 
 
-def _call_gemini(prompt: str) -> str:
+def _call_gemini(prompt: str, is_json: bool = True) -> str:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not configured")
 
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2},
+        "generationConfig": {"temperature": 0.2},
     }
+    if is_json:
+        payload["generationConfig"]["responseMimeType"] = "application/json"
+
     configured_model = os.getenv("GEMINI_MODEL", "").strip()
     models = [configured_model, *_list_gemini_generate_content_models(api_key), *GEMINI_FALLBACK_MODELS] if configured_model else [*_list_gemini_generate_content_models(api_key), *GEMINI_FALLBACK_MODELS]
     last_error = None
@@ -341,21 +344,23 @@ def _gemini_error_detail(response: httpx.Response) -> str:
     return detail[:160]
 
 
-def _call_openai(prompt: str) -> str:
+def _call_openai(prompt: str, is_json: bool = True) -> str:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not configured")
 
     model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    system_msg = "You are a study coach API. Return only valid JSON." if is_json else "You are a helpful study assistant."
     payload = {
         "model": model,
         "messages": [
-            {"role": "system", "content": "You are a study coach API. Return only valid JSON."},
+            {"role": "system", "content": system_msg},
             {"role": "user", "content": prompt},
         ],
-        "response_format": {"type": "json_object"},
         "temperature": 0.2,
     }
+    if is_json:
+        payload["response_format"] = {"type": "json_object"}
     response = httpx.post(
         "https://api.openai.com/v1/chat/completions",
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
@@ -372,12 +377,12 @@ def _provider() -> str:
     return provider if provider in {"mock", "gemini", "openai"} else "mock"
 
 
-def _call_provider(prompt: str) -> str:
+def _call_provider(prompt: str, is_json: bool = True) -> str:
     provider = _provider()
     if provider == "gemini":
-        return _call_gemini(prompt)
+        return _call_gemini(prompt, is_json)
     if provider == "openai":
-        return _call_openai(prompt)
+        return _call_openai(prompt, is_json)
     raise RuntimeError("Mock provider selected")
 
 
@@ -426,3 +431,21 @@ def generate_questions(notes: str) -> list[dict]:
 
 def grade_answer(question: str, expected_answer: str, student_answer: str) -> dict:
     return grade_student_answer(question, expected_answer, student_answer)
+
+
+def chat_with_context(prompt: str, context: str) -> str:
+    provider = _provider()
+    system_instruction = "You are an expert study assistant. Answer the user's question accurately using ONLY the provided context notes."
+    full_prompt = f"{system_instruction}\n\nContext Notes:\n{context}\n\nUser Question:\n{prompt}"
+    
+    if provider == "mock":
+        return f"Mock AI Response: According to the notes, this is a simulated response to '{prompt}'."
+    
+    if provider == "gemini" and not os.getenv("GEMINI_API_KEY"):
+        return f"Mock AI Response: According to the notes, this is a simulated response to '{prompt}' (API key missing)."
+
+    try:
+        return _call_provider(full_prompt, is_json=False)
+    except Exception as exc:
+        print(f"AI chat failed; falling back to mock provider: {exc}")
+        return f"Mock AI Response: Error generating response ({exc})."

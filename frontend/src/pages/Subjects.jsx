@@ -63,96 +63,99 @@ export default function Subjects() {
         </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <section className="space-y-4">
-          {subjects.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2">
-              {subjects.map((subject, i) => {
-                const tone = SUBJECT_TONES[i % SUBJECT_TONES.length];
-                return (
-                  <div
-                    key={subject.id}
-                    className="panel relative overflow-hidden transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md hover:border-neutral-350"
-                  >
-                    <div className={`stat-stripe ${tone.stripe}`} />
-                    <div className="flex items-start gap-3">
-                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${tone.icon}`}>
-                        <BookOpen className="h-5 w-5 pointer-events-none" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <Link
-                          to={`/subjects/${subject.id}`}
-                          className={`text-lg font-bold font-display tracking-tight text-neutral-900 transition-colors ${tone.hover}`}
-                        >
-                          {subject.name}
-                        </Link>
-                        <p className="mt-1 min-h-10 text-sm leading-6 text-slate-500">
-                          {subject.description || 'No description yet.'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-                      <Link
-                        className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-800 hover:text-black font-display tracking-tight transition-transform hover:translate-x-0.5"
-                        to={`/subjects/${subject.id}`}
-                      >
-                        Open subject
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                      <button
-                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-rose-50 hover:text-rose-600"
-                        onClick={() => handleDelete(subject.id)}
-                        type="button"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+      <div className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {/* Create New Card / Form */}
+          {form.isCreating ? (
+            <form
+              onSubmit={handleCreate}
+              className="panel relative overflow-hidden bg-white border-2 border-indigo-500/20 shadow-sm flex flex-col h-full min-h-[240px]"
+            >
+              <div className="flex-1 space-y-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-bold font-display text-neutral-900 tracking-tight">New notebook</h3>
+                  <button type="button" onClick={() => setForm({ name: '', description: '', isCreating: false })} className="text-slate-400 hover:text-slate-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                </div>
+                <input
+                  className="field w-full text-sm"
+                  placeholder="Notebook name"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  autoFocus
+                />
+                <textarea
+                  className="field w-full min-h-[80px] text-sm resize-none"
+                  placeholder="Description (optional)"
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                />
+              </div>
+              <div className="pt-4 mt-auto">
+                <button className="btn-primary w-full shadow-sm" disabled={!form.name.trim()}>
+                  Create Notebook
+                </button>
+              </div>
+            </form>
           ) : (
-            <div className="panel rounded-lg">
-              <EmptyState
-                icon={BookOpen}
-                title="No subjects yet"
-                message="Create your first subject to start adding topics, notes, and revision questions."
-              />
-            </div>
+            <button
+              onClick={() => setForm({ ...form, isCreating: true })}
+              className="panel flex flex-col items-center justify-center min-h-[240px] bg-white border border-neutral-200 hover:border-indigo-200 hover:shadow-md transition-all group cursor-pointer"
+            >
+              <div className="w-16 h-16 rounded-full bg-indigo-50/60 flex items-center justify-center mb-5 group-hover:bg-indigo-100/80 transition-colors">
+                <Plus className="w-8 h-8 text-indigo-600" />
+              </div>
+              <span className="text-xl font-display text-neutral-900">Create new notebook</span>
+            </button>
           )}
-        </section>
 
-        <form
-          onSubmit={handleCreate}
-          className="panel space-y-3 lg:sticky lg:top-24 lg:self-start"
-        >
-          <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg text-white bg-neutral-900">
-              <Sparkles className="h-4 w-4" />
-            </span>
-            <h3 className="text-lg font-bold font-display text-neutral-900 tracking-tight">Create subject</h3>
-          </div>
-          <p className="text-sm text-slate-500">
-            Give it a clear name &mdash; it&rsquo;s the anchor for every topic underneath.
-          </p>
-          <input
-            className="field-vibrant"
-            placeholder="Subject name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-          <textarea
-            className="field-vibrant min-h-28"
-            placeholder="Description (optional)"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
-          <button className="btn-vibrant w-full">
-            <Plus className="h-4 w-4" />
-            Add subject
-          </button>
-        </form>
+          {/* Existing Subjects */}
+          {subjects.map((subject, i) => {
+            const tone = SUBJECT_TONES[i % SUBJECT_TONES.length];
+            return (
+              <div
+                key={subject.id}
+                className="panel relative overflow-hidden flex flex-col min-h-[240px] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md hover:border-neutral-350"
+              >
+                <div className={`stat-stripe ${tone.stripe}`} />
+                <div className="flex items-start gap-3 flex-1">
+                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${tone.icon}`}>
+                    <BookOpen className="h-5 w-5 pointer-events-none" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      to={`/subjects/${subject.id}`}
+                      className={`text-lg font-bold font-display tracking-tight text-neutral-900 transition-colors ${tone.hover}`}
+                    >
+                      {subject.name}
+                    </Link>
+                    <p className="mt-1 text-sm leading-6 text-slate-500 line-clamp-3">
+                      {subject.description || 'No description yet.'}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-2 pt-4 border-t border-neutral-100">
+                  <Link
+                    className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-800 hover:text-black font-display tracking-tight transition-transform hover:translate-x-0.5"
+                    to={`/subjects/${subject.id}`}
+                  >
+                    Open notebook
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <button
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-rose-50 hover:text-rose-600"
+                    onClick={() => handleDelete(subject.id)}
+                    type="button"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
