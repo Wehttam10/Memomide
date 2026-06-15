@@ -33,12 +33,14 @@ export default function SubjectDetail() {
     load();
   }, [subjectId]);
 
-  async function addTopic(event) {
-    event.preventDefault();
-    if (!topicForm.title.trim()) return;
-    await createTopic(subjectId, topicForm);
-    setTopicForm({ title: '', description: '' });
-    await load();
+  async function addTopic() {
+    try {
+      const newTopic = await createTopic(subjectId, { title: 'Untitled Source', description: '' });
+      await load();
+      setSelectedTopicId(newTopic.id);
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   if (error) return <div className="panel text-rose-700 m-6">{error}</div>;
@@ -82,18 +84,14 @@ export default function SubjectDetail() {
             </div>
           </div>
 
-          <form onSubmit={addTopic} className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm space-y-3">
-            <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-500">Add Source</h4>
-            <input 
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900" 
-              placeholder="Topic title..." 
-              value={topicForm.title} 
-              onChange={(e) => setTopicForm({ ...topicForm, title: e.target.value })} 
-            />
-            <button className="w-full flex items-center justify-center gap-2 bg-white border border-neutral-300 text-neutral-800 hover:bg-neutral-50 hover:border-neutral-400 font-semibold rounded-lg px-3 py-2 text-sm transition-all" disabled={!topicForm.title.trim()}>
-              <Plus className="w-4 h-4" /> Add
+          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
+            <button 
+              onClick={addTopic}
+              className="w-full flex items-center justify-center gap-2 bg-neutral-900 text-white hover:bg-neutral-800 font-semibold rounded-lg px-3 py-2.5 text-sm transition-all"
+            >
+              <Plus className="w-4 h-4" /> Add Source
             </button>
-          </form>
+          </div>
         </div>
       </div>
 
