@@ -6,6 +6,7 @@ import { createTopic, deleteTopic, getTopics } from '../api/topics';
 import Loading from '../components/Loading';
 import SubjectChat from '../components/SubjectChat';
 import TopicViewer from '../components/TopicViewer';
+import SwipeableSourceItem from '../components/SwipeableSourceItem';
 
 export default function SubjectDetail() {
   const { subjectId } = useParams();
@@ -43,6 +44,16 @@ export default function SubjectDetail() {
     }
   }
 
+  async function handleDeleteTopic(id) {
+    try {
+      await deleteTopic(id);
+      if (selectedTopicId === id) setSelectedTopicId(null);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   if (error) return <div className="panel text-rose-700 m-6">{error}</div>;
   if (!subject) return <div className="p-6"><Loading label="Loading workspace" rows={4} /></div>;
 
@@ -72,14 +83,13 @@ export default function SubjectDetail() {
                 Subject Guide
               </button>
               {topics.map((topic) => (
-                <button
+                <SwipeableSourceItem
                   key={topic.id}
+                  topic={topic}
+                  isSelected={selectedTopicId === topic.id}
                   onClick={() => setSelectedTopicId(topic.id)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex flex-col gap-0.5 ${selectedTopicId === topic.id ? 'bg-neutral-900 text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-200/50'}`}
-                >
-                  <span className="truncate">{topic.title}</span>
-                  <span className={`text-xs truncate ${selectedTopicId === topic.id ? 'text-neutral-300' : 'text-slate-500'}`}>{topic.status}</span>
-                </button>
+                  onDelete={handleDeleteTopic}
+                />
               ))}
             </div>
           </div>
