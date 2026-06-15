@@ -17,6 +17,7 @@ export default function TopicViewer({ topicId, onDeleted }) {
   const [generating, setGenerating] = useState(false);
   const [aiStatus, setAiStatus] = useState(null);
   const [error, setError] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
 
   async function load() {
     setError('');
@@ -43,6 +44,29 @@ export default function TopicViewer({ topicId, onDeleted }) {
     await createNote(topicId, { content });
     setContent('');
     await load();
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    setIsDragging(true);
+  }
+
+  function handleDragLeave(e) {
+    e.preventDefault();
+    setIsDragging(false);
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setContent((prev) => prev + (prev ? '\n\n' : '') + `--- ${file.name} ---\n\n` + event.target.result);
+      };
+      reader.readAsText(file);
+    }
   }
 
   async function handleGenerate() {
@@ -134,14 +158,32 @@ export default function TopicViewer({ topicId, onDeleted }) {
           <div>
             <form onSubmit={saveNote} className="panel space-y-3 sticky top-6 bg-white shadow-sm border border-neutral-200 rounded-xl p-5">
               <h4 className="font-bold font-display text-neutral-900 tracking-tight flex items-center gap-2 text-sm uppercase">
-                <Plus className="w-4 h-4" /> Add Note
+                <Plus className="w-4 h-4" /> Add Source
               </h4>
-              <textarea 
-                className="field min-h-[200px] text-sm resize-none" 
-                placeholder="Paste text from documents, articles, or write notes directly..." 
-                value={content} 
-                onChange={(e) => setContent(e.target.value)} 
-              />
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`relative rounded-lg border-2 border-dashed transition-colors p-1 ${
+                  isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-neutral-300 hover:border-neutral-400'
+                }`}
+              >
+                <textarea 
+                  className={`field w-full min-h-[200px] text-sm resize-none bg-transparent border-0 focus:ring-0 ${
+                    isDragging ? 'pointer-events-none opacity-50' : ''
+                  }`} 
+                  placeholder="Paste text from documents, or drag & drop a text file here..." 
+                  value={content} 
+                  onChange={(e) => setContent(e.target.value)} 
+                />
+                {isDragging && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span className="text-indigo-600 font-bold bg-white/80 px-4 py-2 rounded-full shadow-sm">
+                      Drop file to insert text
+                    </span>
+                  </div>
+                )}
+              </div>
               <button className="btn-primary w-full shadow-sm text-sm" disabled={!content.trim()}>
                 Save Source
               </button>
