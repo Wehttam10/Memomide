@@ -2,6 +2,11 @@ import { useState, useRef } from 'react';
 import { Upload, Clipboard, X } from 'lucide-react';
 import { createTopic } from '../api/topics';
 import { createNote } from '../api/notes';
+import mammoth from 'mammoth';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdded }) {
   const [view, setView] = useState('menu'); // 'menu' | 'text'
@@ -33,13 +38,53 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
     onClose();
   }
 
-  function handleFile(file) {
+  async function handleFile(file) {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      handleCreateSource(file.name, event.target.result);
-    };
-    reader.readAsText(file);
+    setLoading(true);
+
+    try {
+      if (file.name.endsWith('.docx')) {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const arrayBuffer = event.target.result;
+            const result = await mammoth.extractRawText({ arrayBuffer });
+            await handleCreateSource(file.name, result.value);
+          } catch (err) {
+            alert("Failed to parse Word document: " + err.message);
+            setLoading(false);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+        return;
+      }
+
+      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map(item => item.str).join(' ');
+          fullText += pageText + '\n\n';
+        }
+        
+        await handleCreateSource(file.name, fullText.trim());
+        return;
+      }
+
+      // Default text reading
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        await handleCreateSource(file.name, event.target.result);
+      };
+      reader.readAsText(file);
+    } catch (err) {
+      alert("Error reading file: " + err.message);
+      setLoading(false);
+    }
   }
 
   function handleDragOver(e) {
@@ -81,7 +126,7 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
               }`}
             >
               <h2 className="text-3xl md:text-4xl font-display font-medium text-neutral-900 mb-3">or drop your files</h2>
-              <p className="text-neutral-500 mb-12">text, markdown, csv, and more</p>
+              <p className="text-neutral-500 mb-12">pdf, docs, text, markdown, csv, and more</p>
 
               <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-xl">
                 <button 
@@ -97,7 +142,7 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
                   ref={fileInputRef} 
                   onChange={(e) => handleFile(e.target.files[0])} 
                   className="hidden" 
-                  accept=".txt,.md,.csv,.json" 
+                  accept=".txt,.md,.csv,.json,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
                 />
 
                 <button 
