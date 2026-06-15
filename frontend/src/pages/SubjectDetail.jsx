@@ -7,6 +7,7 @@ import Loading from '../components/Loading';
 import SubjectChat from '../components/SubjectChat';
 import TopicViewer from '../components/TopicViewer';
 import SwipeableSourceItem from '../components/SwipeableSourceItem';
+import AddSourceModal from '../components/AddSourceModal';
 
 export default function SubjectDetail() {
   const { subjectId } = useParams();
@@ -19,6 +20,7 @@ export default function SubjectDetail() {
   const [selectedTopicId, setSelectedTopicId] = useState(null);
   const [showChat, setShowChat] = useState(true);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [isAddSourceModalOpen, setIsAddSourceModalOpen] = useState(false);
 
   async function load() {
     try {
@@ -34,14 +36,10 @@ export default function SubjectDetail() {
     load();
   }, [subjectId]);
 
-  async function addTopic() {
-    try {
-      const newTopic = await createTopic(subjectId, { title: 'Untitled Source', description: '' });
-      await load();
-      setSelectedTopicId(newTopic.id);
-    } catch (err) {
-      setError(err.message);
-    }
+  function handleSourceAdded(newTopicId) {
+    load().then(() => {
+      setSelectedTopicId(newTopicId);
+    });
   }
 
   async function handleDeleteTopic(id) {
@@ -96,7 +94,7 @@ export default function SubjectDetail() {
 
           <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
             <button 
-              onClick={addTopic}
+              onClick={() => setIsAddSourceModalOpen(true)}
               className="w-full flex items-center justify-center gap-2 bg-neutral-900 text-white hover:bg-neutral-800 font-semibold rounded-lg px-3 py-2.5 text-sm transition-all"
             >
               <Plus className="w-4 h-4" /> Add Source
@@ -144,7 +142,7 @@ export default function SubjectDetail() {
         {showChat && <SubjectChat subjectId={subjectId} />}
       </div>
 
-      {/* Chat Toggle Button (Floating if chat is closed, or inline if open but we can put it in header) */}
+    {/* Chat Toggle Button (Floating if chat is closed, or inline if open but we can put it in header) */}
       <div className="absolute top-4 right-4 z-10 flex gap-2">
         <button 
           onClick={() => setShowChat(!showChat)} 
@@ -155,6 +153,12 @@ export default function SubjectDetail() {
         </button>
       </div>
 
+      <AddSourceModal 
+        isOpen={isAddSourceModalOpen} 
+        onClose={() => setIsAddSourceModalOpen(false)} 
+        subjectId={subjectId} 
+        onSourceAdded={handleSourceAdded}
+      />
     </div>
   );
 }
