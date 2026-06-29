@@ -6,6 +6,17 @@ import mammoth from 'mammoth';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 
+if (typeof Promise.withResolvers !== 'function') {
+  Promise.withResolvers = function () {
+    let resolve, reject;
+    const promise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdded }) {
