@@ -61,7 +61,7 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
 
       if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
         let fullText = '';
         
         for (let i = 1; i <= pdf.numPages; i++) {
