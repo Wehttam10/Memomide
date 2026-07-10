@@ -150,6 +150,7 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
                 </button>
                 <input 
                   type="file" 
+                  data-testid="file-input"
                   ref={fileInputRef} 
                   onChange={(e) => handleFile(e.target.files[0])} 
                   className="hidden" 
