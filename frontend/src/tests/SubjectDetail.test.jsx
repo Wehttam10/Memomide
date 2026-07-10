@@ -40,8 +40,11 @@ vi.mock('../components/TopicViewer', () => ({
 }));
 
 vi.mock('../components/SubjectChat', () => ({
-  default: ({ subjectId }) => (
-    <div data-testid="subject-chat">SubjectChat ID: {subjectId}</div>
+  default: ({ subjectId, onClose }) => (
+    <div data-testid="subject-chat">
+      SubjectChat ID: {subjectId}
+      {onClose && <button onClick={onClose} title="Collapse Chat">Collapse</button>}
+    </div>
   ),
 }));
 
@@ -81,6 +84,7 @@ describe('SubjectDetail Component', () => {
     vi.clearAllMocks();
     getSubject.mockResolvedValue(mockSubject);
     getTopics.mockResolvedValue(mockTopics);
+    vi.stubGlobal('innerWidth', 1280);
   });
 
   it('renders subject details and sidebar topics', async () => {
@@ -150,16 +154,20 @@ describe('SubjectDetail Component', () => {
       expect(screen.getByTestId('subject-chat')).toBeInTheDocument();
     });
 
-    // Find the toggle chat button
-    const chatToggleBtn = document.querySelector('button .lucide-message-square')?.closest('button');
-    expect(chatToggleBtn).toBeInTheDocument();
+    // Find the collapse chat button inside the mock
+    const collapseBtn = screen.getByTitle('Collapse Chat');
+    expect(collapseBtn).toBeInTheDocument();
 
     // Click to close chat panel
-    await user.click(chatToggleBtn);
+    await user.click(collapseBtn);
     expect(screen.queryByTestId('subject-chat')).not.toBeInTheDocument();
 
+    // Find the expand chat button
+    const expandBtn = screen.getByTitle('Expand Chat');
+    expect(expandBtn).toBeInTheDocument();
+
     // Click to reopen chat panel
-    await user.click(chatToggleBtn);
+    await user.click(expandBtn);
     expect(screen.getByTestId('subject-chat')).toBeInTheDocument();
   });
 

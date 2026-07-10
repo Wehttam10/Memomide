@@ -14,23 +14,23 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-neutral-200 bg-white/95">
+    <header className="sticky top-0 z-10 border-b border-slate-200/85 bg-white/80 backdrop-blur-md">
       <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-5">
         <div>
-          <h1 className="text-base font-bold text-neutral-900 sm:text-lg font-display tracking-tight">Study workspace</h1>
+          <h1 className="text-base font-bold text-slate-900 sm:text-lg font-display tracking-tight">Study workspace</h1>
         </div>
 
         <form
           onSubmit={handleSearchSubmit}
-          className="flex w-64 sm:w-80 items-center gap-2 rounded-md border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm text-neutral-500 transition-all duration-200 focus-within:border-neutral-400 focus-within:bg-white"
+          className="flex w-48 sm:w-64 md:w-80 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 text-sm text-slate-500 transition-all duration-300 ease-elegant focus-within:w-56 sm:focus-within:w-80 md:focus-within:w-96 focus-within:border-teal-500 focus-within:bg-white focus-within:ring-1 focus-within:ring-teal-500/20"
         >
-          <Search className="h-4 w-4 text-neutral-400 pointer-events-none" />
+          <Search className="h-4 w-4 text-slate-400 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search workspace..."
-            className="w-full bg-transparent text-neutral-850 placeholder-neutral-400 outline-none text-xs sm:text-sm font-display tracking-tight"
+            className="w-full bg-transparent text-slate-800 placeholder-slate-400 outline-none text-xs sm:text-sm font-sans tracking-tight"
           />
         </form>
 
@@ -40,3 +40,4 @@ export default function Navbar() {
     </header>
   );
 }
+

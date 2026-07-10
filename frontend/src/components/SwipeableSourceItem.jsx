@@ -43,14 +43,14 @@ export default function SwipeableSourceItem({ topic, isSelected, onClick, onDele
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         style={{ transform: `translateX(${offset}px)` }}
-        className={`relative z-10 w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center justify-between gap-2 
+        className={`relative z-10 w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center justify-between gap-2 
           ${isSwiping ? 'transition-none' : 'transition-transform duration-200'} 
-          ${isSelected ? 'bg-neutral-900 text-white shadow-sm' : 'bg-white text-neutral-700 hover:bg-neutral-100'}
+          ${isSelected ? 'bg-teal-50 text-teal-700 border-l-2 border-teal-500 font-semibold shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-50'}
         `}
       >
         <div className="flex flex-col min-w-0 flex-1">
           <span className="truncate">{topic.title}</span>
-          <span className={`text-xs truncate ${isSelected ? 'text-neutral-300' : 'text-slate-500'}`}>{topic.status}</span>
+          <span className={`text-xs truncate ${isSelected ? 'text-teal-600/80 font-mono' : 'text-slate-500'}`}>{topic.status}</span>
         </div>
         
         {/* Desktop hover delete button */}

@@ -1,8 +1,8 @@
 const styles = {
-  Strong: 'bg-neutral-900 text-white border-neutral-900 font-mono text-[10px] uppercase tracking-wider',
-  Good: 'bg-neutral-100 text-neutral-950 border-neutral-300 font-mono text-[10px] uppercase tracking-wider',
-  Weak: 'bg-white text-neutral-600 border-neutral-250 font-mono text-[10px] uppercase tracking-wider',
-  Critical: 'bg-white text-neutral-950 border-neutral-400 border-dashed font-mono text-[10px] uppercase tracking-wider',
+  Strong: 'bg-emerald-50 text-emerald-700 border-emerald-200/60 font-mono text-[10px] uppercase tracking-wider',
+  Good: 'bg-teal-50 text-teal-700 border-teal-200/60 font-mono text-[10px] uppercase tracking-wider',
+  Weak: 'bg-amber-50 text-amber-700 border-amber-200/60 font-mono text-[10px] uppercase tracking-wider',
+  Critical: 'bg-rose-50 text-rose-700 border-rose-200/60 border-dashed font-mono text-[10px] uppercase tracking-wider animate-pulse',
 };
 
 export default function StatusBadge({ status }) {
