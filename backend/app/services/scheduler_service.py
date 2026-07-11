@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 def interval_for_score(score: float) -> int:
@@ -15,4 +15,4 @@ def interval_for_score(score: float) -> int:
 
 def next_review_date(score: float) -> tuple[datetime, int]:
     interval_days = interval_for_score(score)
-    return datetime.utcnow() + timedelta(days=interval_days), interval_days
+    return datetime.now(timezone.utc) + timedelta(days=interval_days), interval_days

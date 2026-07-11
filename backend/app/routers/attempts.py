@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
@@ -44,7 +44,7 @@ def submit_attempt(question_id: int, payload: AttemptCreate, db: Session = Depen
     if not schedule:
         schedule = ReviewSchedule(topic_id=topic.id, user_id=current_user.id, next_review_date=review_date, interval_days=interval_days, status=topic.status)
         db.add(schedule)
-    schedule.last_review_date = datetime.utcnow()
+    schedule.last_review_date = datetime.now(timezone.utc)
     schedule.next_review_date = review_date
     schedule.interval_days = interval_days
     schedule.status = topic.status

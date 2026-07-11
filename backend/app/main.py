@@ -5,15 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine
 from .routers import attempts, auth, dashboard, notes, questions, revision, subjects, topics
 
-Base.metadata.create_all(bind=engine)
-
+from .database import Base, engine, get_db
+from sqlalchemy.orm import Session
 from sqlalchemy import text
-try:
-    with engine.connect() as conn:
-        conn.execute(text("ALTER TABLE users ADD COLUMN avatar TEXT;"))
-        conn.commit()
-except Exception:
-    pass
+from fastapi import Depends
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="MemoMind API")
 
@@ -43,5 +40,9 @@ app.include_router(revision.router)
 
 
 @app.get("/")
-def root():
-    return {"message": "MemoMind API is running"}
+def root(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+        return {"status": "ok", "message": "MemoMind API is running", "database": "connected"}
+    except Exception as e:
+        return {"status": "error", "message": "MemoMind API is running, but database connection failed", "details": str(e)}
