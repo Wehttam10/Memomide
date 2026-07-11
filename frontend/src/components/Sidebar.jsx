@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { BarChart3, BookOpen, CalendarClock, User, Trophy, LogOut, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../api/auth';
@@ -13,7 +13,7 @@ const links = [
 
 export { links };
 
-export default function Sidebar({ mobile = false }) {
+const Sidebar = React.memo(function Sidebar({ mobile = false }) {
   const navigate = useNavigate();
   const [isMinimized, setIsMinimized] = useState(() => {
     if (mobile) return false;
@@ -150,5 +150,6 @@ export default function Sidebar({ mobile = false }) {
       </div>
     </aside>
   );
-}
+});
 
+export default Sidebar;

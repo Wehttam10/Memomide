@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function Navbar() {
+const Navbar = React.memo(function Navbar() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -39,5 +39,6 @@ export default function Navbar() {
       </div>
     </header>
   );
-}
+});
 
+export default Navbar;
