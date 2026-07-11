@@ -448,4 +448,49 @@ def chat_with_context(prompt: str, context: str) -> str:
         return _call_provider(full_prompt, is_json=False)
     except Exception as exc:
         print(f"AI chat failed; falling back to mock provider: {exc}")
-        return f"Mock AI Response: Error generating response ({exc})."
+def _summarize_prompt(text: str) -> str:
+    return f"""
+You are an expert study assistant and summarizer, acting like NotebookLM.
+Analyze the following raw document text and create a highly structured, readable set of study notes.
+
+Rules:
+- Extract the main title/topic.
+- Provide a brief 2-sentence overview.
+- Break down the core concepts into clear, digestible bullet points.
+- Identify 3-5 key definitions or important terms.
+- Omit irrelevant fluff, table of contents, or formatting noise.
+- Return ONLY valid JSON in the exact format specified. Do not include markdown.
+
+Raw Text:
+{text[:15000]}
+
+Return JSON exactly like this:
+{{
+  "title": "Main topic title",
+  "summary_notes": "# Overview\n...\n\n## Core Concepts\n- Point 1...\n\n## Key Terms\n- **Term**: Definition..."
+}}
+""".strip()
+
+def mock_summarize(text: str) -> dict:
+    title = text.split('\n')[0][:50] if text else "Document Summary"
+    snippet = text[:500].replace('\n', ' ')
+    return {
+        "title": title,
+        "summary_notes": f"# Overview\nThis is an auto-generated summary of the uploaded document.\n\n## Extracted Text Snippet\n{snippet}...\n\n*Note: AI provider is currently in mock mode.*"
+    }
+
+def summarize_document(text: str) -> dict:
+    provider = _provider()
+    if provider == "mock":
+        return mock_summarize(text)
+    if provider == "gemini" and not os.getenv("GEMINI_API_KEY"):
+        return mock_summarize(text)
+        
+    try:
+        data = _extract_json(_call_provider(_summarize_prompt(text), is_json=True))
+        title = data.get("title", "Document Summary")
+        notes = data.get("summary_notes", "Summary generation failed.")
+        return {"title": title, "summary_notes": notes}
+    except Exception as exc:
+        print(f"AI summarization failed; falling back to mock provider: {exc}")
+        return mock_summarize(text)

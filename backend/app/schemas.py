@@ -57,6 +57,10 @@ class SubjectOut(SubjectBase):
     created_at: datetime
 
 
+class SummarizeRequest(BaseModel):
+    text: str = Field(min_length=1)
+    file_name: Optional[str] = None
+
 class SubjectChatRequest(BaseModel):
     message: str
 

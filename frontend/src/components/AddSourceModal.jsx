@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
-import { Upload, Clipboard, X } from 'lucide-react';
-import { createTopic } from '../api/topics';
-import { createNote } from '../api/notes';
+import { Upload, Clipboard, X, Sparkles } from 'lucide-react';
+import { summarizeSubjectSource } from '../api/subjects';
 import mammoth from 'mammoth';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
@@ -31,12 +30,11 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
   async function handleCreateSource(title, content) {
     setLoading(true);
     try {
-      const topic = await createTopic(subjectId, { title, description: '' });
-      await createNote(topic.id, { content });
+      const topic = await summarizeSubjectSource(subjectId, { text: content, file_name: title });
       onSourceAdded(topic.id);
       handleClose();
     } catch (err) {
-      alert("Failed to add source: " + err.message);
+      alert("Failed to summarize source: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -78,11 +76,14 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
-          const pageText = textContent.items.map(item => item.str).join(' ');
-          fullText += pageText + '\n\n';
+          
+          if (textContent && Array.isArray(textContent.items)) {
+            const pageText = textContent.items.map(item => item.str || '').join(' ');
+            fullText += pageText + '\n\n';
+          }
         }
         
-        await handleCreateSource(file.name, fullText.trim());
+        await handleCreateSource(file.name, fullText.trim() || 'No text could be extracted from this PDF.');
         return;
       }
 
@@ -167,7 +168,12 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
                 </button>
               </div>
 
-              {loading && <p className="mt-8 text-indigo-600 font-medium animate-pulse">Processing source...</p>}
+              {loading && (
+                <div className="mt-8 flex flex-col items-center gap-2 text-indigo-600 animate-pulse">
+                  <Sparkles className="w-6 h-6" />
+                  <p className="font-medium">AI is summarizing your document...</p>
+                </div>
+              )}
             </div>
           )}
 

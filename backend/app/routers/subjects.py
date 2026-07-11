@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..dependencies import get_current_user
-from ..models import Subject, User
-from ..schemas import SubjectCreate, SubjectOut, SubjectUpdate, SubjectChatRequest, SubjectChatResponse
+from ..models import Subject, User, Topic, Note
+from ..schemas import SubjectCreate, SubjectOut, SubjectUpdate, SubjectChatRequest, SubjectChatResponse, SummarizeRequest, TopicOut
 from .helpers import get_owned_subject
+from ..services.memory_service import status_for_score
 
 router = APIRouter(prefix="/subjects", tags=["subjects"])
 
@@ -67,3 +68,21 @@ def chat_with_subject(subject_id: int, payload: SubjectChatRequest, db: Session 
     response = chat_with_context(payload.message, context)
     return SubjectChatResponse(response=response)
 
+@router.post("/{subject_id}/summarize", response_model=TopicOut, status_code=status.HTTP_201_CREATED)
+def summarize_subject_source(subject_id: int, payload: SummarizeRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    subject = get_owned_subject(db, subject_id, current_user)
+    
+    from ..services.ai_service import summarize_document
+    summary_data = summarize_document(payload.text)
+    
+    topic_title = payload.file_name or summary_data.get("title", "Document Summary")
+    topic = Topic(title=topic_title, description="Auto-generated summary", subject_id=subject.id, status=status_for_score(50))
+    db.add(topic)
+    db.commit()
+    db.refresh(topic)
+    
+    note = Note(content=summary_data.get("summary_notes", ""), file_name=payload.file_name, topic_id=topic.id)
+    db.add(note)
+    db.commit()
+    
+    return topic
