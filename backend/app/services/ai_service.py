@@ -273,75 +273,32 @@ def _call_gemini(prompt: str, is_json: bool = True) -> str:
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not configured")
 
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.2},
-    }
-    if is_json:
-        payload["generationConfig"]["responseMimeType"] = "application/json"
-
-    configured_model = os.getenv("GEMINI_MODEL", "").strip()
-    models = [configured_model, *_list_gemini_generate_content_models(api_key), *GEMINI_FALLBACK_MODELS] if configured_model else [*_list_gemini_generate_content_models(api_key), *GEMINI_FALLBACK_MODELS]
-    last_error = None
-
-    for model in dict.fromkeys(_normalize_gemini_model_name(model) for model in models if model):
-        request_model = _normalize_gemini_model_name(model).replace("models/", "")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{request_model}:generateContent"
-        try:
-            response = httpx.post(url, params={"key": api_key}, json=payload, timeout=DEFAULT_TIMEOUT)
-            response.raise_for_status()
-            data = response.json()
-            return data["candidates"][0]["content"]["parts"][0]["text"]
-        except httpx.HTTPStatusError as exc:
-            status_code = exc.response.status_code
-            detail = _gemini_error_detail(exc.response)
-            last_error = f"{model} returned HTTP {status_code}{': ' + detail if detail else ''}"
-            if status_code not in {404, 429}:
-                raise RuntimeError(f"Gemini request failed with HTTP {status_code}{': ' + detail if detail else ''}") from None
-
-    raise RuntimeError(f"No configured Gemini model was available. Last error: {last_error}")
-
-
-def _normalize_gemini_model_name(model: str) -> str:
-    model = model.strip()
-    return model if model.startswith("models/") else f"models/{model}"
-
-
-def _list_gemini_generate_content_models(api_key: str) -> list[str]:
     try:
-        response = httpx.get(
-            "https://generativelanguage.googleapis.com/v1beta/models",
-            params={"key": api_key},
-            timeout=DEFAULT_TIMEOUT,
+        from google import genai
+        from google.genai import types
+    except ImportError:
+        raise RuntimeError("google-genai package is not installed.")
+
+    client = genai.Client(api_key=api_key)
+
+    config = types.GenerateContentConfig(
+        temperature=0.2,
+        response_mime_type="application/json" if is_json else "text/plain",
+    )
+
+    configured_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
+    
+    try:
+        response = client.models.generate_content(
+            model=configured_model,
+            contents=prompt,
+            config=config,
         )
-        response.raise_for_status()
-        models = response.json().get("models", [])
+        if response.text:
+            return response.text
+        raise RuntimeError("Empty response text from Gemini")
     except Exception as exc:
-        print(f"Could not list Gemini models; using configured fallbacks: {exc}")
-        return []
-
-    usable = []
-    for model in models:
-        methods = model.get("supportedGenerationMethods", [])
-        name = model.get("name", "")
-        if "generateContent" in methods and name:
-            usable.append(name)
-
-    preferred = [model for model in usable if "flash" in model.lower()]
-    return preferred or usable
-
-
-def _gemini_error_detail(response: httpx.Response) -> str:
-    try:
-        payload = response.json()
-    except ValueError:
-        return response.text[:160]
-
-    error = payload.get("error", {}) if isinstance(payload, dict) else {}
-    status = str(error.get("status", "")).strip()
-    message = str(error.get("message", "")).strip()
-    detail = " - ".join(part for part in [status, message] if part)
-    return detail[:160]
+        raise RuntimeError(f"Gemini request failed: {exc}") from exc
 
 
 def _call_openai(prompt: str, is_json: bool = True) -> str:
