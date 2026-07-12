@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..dependencies import get_current_user
-from ..models import Subject, User, Topic, Note
+from ..models import Subject, User, Topic, Note, Question
 from ..schemas import SubjectCreate, SubjectOut, SubjectUpdate, SubjectChatRequest, SubjectChatResponse, SummarizeRequest, TopicOut
 from .helpers import get_owned_subject
 from ..services.memory_service import status_for_score
@@ -81,8 +81,20 @@ def summarize_subject_source(subject_id: int, payload: SummarizeRequest, db: Ses
     db.commit()
     db.refresh(topic)
     
-    note = Note(content=summary_data.get("summary_notes", ""), file_name=payload.file_name, topic_id=topic.id)
+    note = Note(content=summary_data.get("summary", ""), file_name=payload.file_name, topic_id=topic.id)
     db.add(note)
+    
+    questions = summary_data.get("questions", [])
+    for q in questions:
+        question = Question(
+            topic_id=topic.id,
+            question_text=q.get("question", ""),
+            expected_answer=q.get("expected_answer", ""),
+            question_type="explanation",
+            difficulty="medium"
+        )
+        db.add(question)
+        
     db.commit()
     
     return topic

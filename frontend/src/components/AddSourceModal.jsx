@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Upload, Clipboard, X, Sparkles } from 'lucide-react';
 import { summarizeSubjectSource } from '../api/subjects';
 import mammoth from 'mammoth';
-import * as pdfjsLib from 'pdfjs-dist';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 
 if (typeof Promise.withResolvers !== 'function') {
@@ -70,7 +70,10 @@ export default function AddSourceModal({ isOpen, onClose, subjectId, onSourceAdd
 
       if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+        const pdf = await pdfjsLib.getDocument({ 
+          data: new Uint8Array(arrayBuffer),
+          standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/standard_fonts/`,
+        }).promise;
         let fullText = '';
         
         for (let i = 1; i <= pdf.numPages; i++) {

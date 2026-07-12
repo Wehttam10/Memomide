@@ -450,25 +450,13 @@ def chat_with_context(prompt: str, context: str) -> str:
         print(f"AI chat failed; falling back to mock provider: {exc}")
 def _summarize_prompt(text: str) -> str:
     return f"""
-You are an expert study assistant and summarizer, acting like NotebookLM.
-Analyze the following raw document text and create a highly structured, readable set of study notes.
+You are an expert educational AI. I will provide you with a student's study notes. First, generate a concise summary of the core concepts in the text. Second, generate 3 targeted revision questions based ONLY on the provided text.
+Format your response strictly as a JSON object containing two keys:
+'summary': A string containing the concise summary.
+'questions': A JSON array of objects, where each object has a 'question' and an 'expected_answer'.
 
-Rules:
-- Extract the main title/topic.
-- Provide a brief 2-sentence overview.
-- Break down the core concepts into clear, digestible bullet points.
-- Identify 3-5 key definitions or important terms.
-- Omit irrelevant fluff, table of contents, or formatting noise.
-- Return ONLY valid JSON in the exact format specified. Do not include markdown.
-
-Raw Text:
+Student's study notes (Raw Text):
 {text[:15000]}
-
-Return JSON exactly like this:
-{{
-  "title": "Main topic title",
-  "summary_notes": "# Overview\n...\n\n## Core Concepts\n- Point 1...\n\n## Key Terms\n- **Term**: Definition..."
-}}
 """.strip()
 
 def mock_summarize(text: str) -> dict:
@@ -476,7 +464,21 @@ def mock_summarize(text: str) -> dict:
     snippet = text[:500].replace('\n', ' ')
     return {
         "title": title,
-        "summary_notes": f"# Overview\nThis is an auto-generated summary of the uploaded document.\n\n## Extracted Text Snippet\n{snippet}...\n\n*Note: AI provider is currently in mock mode.*"
+        "summary": f"# Overview\nThis is an auto-generated summary.\n\n## Extracted Snippet\n{snippet}...",
+        "questions": [
+            {
+                "question": "What is the main topic of the uploaded document?",
+                "expected_answer": title
+            },
+            {
+                "question": "Provide a brief snippet from the document.",
+                "expected_answer": snippet[:50] + "..."
+            },
+            {
+                "question": "Is this a real AI response?",
+                "expected_answer": "No, this is a mock generated response."
+            }
+        ]
     }
 
 def summarize_document(text: str) -> dict:
@@ -488,9 +490,11 @@ def summarize_document(text: str) -> dict:
         
     try:
         data = _extract_json(_call_provider(_summarize_prompt(text), is_json=True))
-        title = data.get("title", "Document Summary")
-        notes = data.get("summary_notes", "Summary generation failed.")
-        return {"title": title, "summary_notes": notes}
+        # Safely extract title from text or fallback
+        title = text.split('\n')[0][:50] if text else "Document Summary"
+        summary = data.get("summary", "Summary generation failed.")
+        questions = data.get("questions", [])
+        return {"title": title, "summary": summary, "questions": questions}
     except Exception as exc:
         print(f"AI summarization failed; falling back to mock provider: {exc}")
         return mock_summarize(text)
