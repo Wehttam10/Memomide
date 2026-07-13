@@ -301,6 +301,35 @@ def _call_gemini(prompt: str, is_json: bool = True) -> str:
         raise RuntimeError(f"Gemini request failed: {exc}") from exc
 
 
+def _call_claude(prompt: str, is_json: bool = True) -> str:
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError("ANTHROPIC_API_KEY is not configured")
+
+    try:
+        from anthropic import Anthropic
+    except ImportError:
+        raise RuntimeError("anthropic package is not installed.")
+
+    client = Anthropic(api_key=api_key)
+    model = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620").strip()
+    
+    system_msg = "You are a study coach API. Return ONLY valid JSON and no conversational text." if is_json else "You are a helpful study assistant."
+    
+    try:
+        response = client.messages.create(
+            model=model,
+            max_tokens=4096,
+            system=system_msg,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        return response.content[0].text
+    except Exception as exc:
+        raise RuntimeError(f"Claude request failed: {exc}") from exc
+
+
 def _call_openai(prompt: str, is_json: bool = True) -> str:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -331,7 +360,7 @@ def _call_openai(prompt: str, is_json: bool = True) -> str:
 
 def _provider() -> str:
     provider = os.getenv("AI_PROVIDER", "mock").lower().strip()
-    return provider if provider in {"mock", "gemini", "openai"} else "mock"
+    return provider if provider in {"mock", "gemini", "openai", "claude"} else "mock"
 
 
 def _call_provider(prompt: str, is_json: bool = True) -> str:
@@ -340,6 +369,8 @@ def _call_provider(prompt: str, is_json: bool = True) -> str:
         return _call_gemini(prompt, is_json)
     if provider == "openai":
         return _call_openai(prompt, is_json)
+    if provider == "claude":
+        return _call_claude(prompt, is_json)
     raise RuntimeError("Mock provider selected")
 
 
